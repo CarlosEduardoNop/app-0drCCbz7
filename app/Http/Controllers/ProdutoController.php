@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Produtos;
+use App\Models\logProduto;
 use Illuminate\Support\Facades\Hash;
 
 class ProdutoController extends Controller
@@ -15,7 +16,7 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        return Produtos::all();
+        return logProduto::all();
     }
 
     /**
@@ -81,7 +82,41 @@ class ProdutoController extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        if ($id){
+            $existingItem = Produtos::find($id);
+            if($existingItem){
+                $newLog = new logProduto();
+                $newLog->sku = $existingItem->sku;
+                if($request->sku){
+                    $newLog->novo_sku = $existingItem->sku;
+                    $existingItem->sku = $request->sku;
+                    $newLog->sku = $request->sku;
+                };
+                if($request->quantidade and $request->quantidade >= 1){
+                    if (is_numeric($request->quantidade)){
+                        $newLog->quantidade = $request->quantidade;
+                        $newLog->quantidade_anterior = $existingItem->quantidade;
+                        if($request->operacao == '+'){
+                            $existingItem->quantidade = $existingItem->quantidade + $request->quantidade;
+                            $newLog->operacao = '+';
+                        }elseif($request->operacao == '-'){
+                            $existingItem->quantidade = $existingItem->quantidade - $request->quantidade;
+                            $newLog->operacao = '-';
+                        }else{
+                            $existingItem->quantidade = $request->quantidade;
+                            $newLog->operacao = '+';
+                        };
+                        $newLog->quantidade_atual = $existingItem->quantidade;
+                    };
+                };
+                if($request->sku == false and $request->quantidade == false){return 'Informe os dados';};
+                $existingItem->save();
+                $newLog->produto_id = $id;
+                $newLog->save();
+                return $existingItem;
+            };
+            return 'Item não encontrado';
+        };
     }
 
     /**
