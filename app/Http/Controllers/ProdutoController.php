@@ -19,6 +19,11 @@ class ProdutoController extends Controller
         return logProduto::all();
     }
 
+    public function getLog($id)
+    {
+        return logProduto::where('produto_id', $id)->orderBy('created_at')->get();
+    }
+
     /**
      * Show the form for creating a new resource.
      *
