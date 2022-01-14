@@ -93,9 +93,11 @@ class ProdutoController extends Controller
                 $newLog = new logProduto();
                 $newLog->sku = $existingItem->sku;
                 if($request->sku){
-                    $newLog->novo_sku = $existingItem->sku;
-                    $existingItem->sku = $request->sku;
-                    $newLog->sku = $request->sku;
+                    if(is_bool($request->sku)){
+                        $newLog->novo_sku = $existingItem->sku;
+                        $existingItem->sku = bin2hex(random_bytes(12));
+                        $newLog->sku = $existingItem->sku;
+                    };
                 };
                 if($request->quantidade and $request->quantidade >= 1){
                     if (is_numeric($request->quantidade)){
