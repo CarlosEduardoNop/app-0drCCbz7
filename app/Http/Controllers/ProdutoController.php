@@ -31,7 +31,7 @@ class ProdutoController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -116,7 +116,7 @@ class ProdutoController extends Controller
                         $newLog->quantidade_atual = $existingItem->quantidade;
                     };
                 };
-                if($request->sku == false and $request->quantidade == false){return 'Informe os dados';};
+                if($request->sku == false and is_numeric($request->quantidade) == false){return 'Houve algum erro ao tentar alterar o produto';};
                 $existingItem->save();
                 $newLog->produto_id = $id;
                 $newLog->save();
@@ -134,6 +134,24 @@ class ProdutoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $existingItem = Produtos::find($id);
+
+        if($existingItem){
+            $existingItem->delete();
+            return 'Item deletado com sucesso';
+        };
+
+        return 'Informe um ID correto';
+    }
+
+    public function destroyLog($id){
+        $existingItem = logProduto::find($id);
+
+        if($existingItem){
+            $existingItem->delete();
+            return 'Log deletada com sucesso';
+        };
+
+        return 'Informe um ID correto';
     }
 }

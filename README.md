@@ -17,12 +17,12 @@
 
 ## Puxar os produtos
 
-Para puxar os produtos basta utilizar o metodo GET na url abaixo utilizando o content-type "application/json".
+Para puxar os produtos basta utilizar o método GET na url abaixo utilizando o content-type "application/json".
 > http://127.0.0.1:8000/api/produtos
 
 ## Cadastrar um produto
 
-Para cadastrar um usuário é necessário passar por meio do body a string "nome" e a quantidade de produtos pela string "quantidade"(O valor quantidade só suporta o tipo number). O SKU é gerado automaticamente pelo sistema.
+Para cadastrar basta usar o método POST, para criar um usuário é necessário passar por meio do body a string "nome" e a quantidade de produtos pela string "quantidade"(O valor quantidade só suporta o tipo number). O SKU é gerado automaticamente pelo sistema.
 > http://127.0.0.1:8000/api/produto/store
 Exemplo de como pode ser passado:
 > {
@@ -32,7 +32,10 @@ Exemplo de como pode ser passado:
 
 ## Alterar um produto
 
-Para alterar o produto é necessário passar o que quer que seja alterado, podendo escolher apenas alterar SKU(tome muito cuidado antes de alterar) ou quantidade. Para alterar a quantidade é possível utilizar as operações de adição e subtração, onde pode ser passado como string "+" ou "-", caso não passe este valor será então "+". Sempre utilizando o content-type "application/json"
+Para alterar um produto basta utilizar o método PUT, para alterar é necessário passar o que quer que seja alterado, podendo escolher apenas alterar SKU(tome muito cuidado antes de alterar) ou quantidade. Para alterar a quantidade é possível utilizar as operações de adição e subtração, onde pode ser passado como string "+" ou "-", caso não passe este valor será então "+". Sempre utilizando o content-type "application/json"
+>http://127.0.0.1:8000/api/produto/{id}
+
+
 Exemplo de como podem ser passados:
 ###### Alterar o SKU
 > {
@@ -63,3 +66,8 @@ Exemplo de como podem ser passados:
     > "operacao": "+",
     > "sku": true
 > }
+
+## Puxar as logs de um produto
+
+Para puxar as logs de um produto basta utlizar o método GET no url informado abaixo passando o ID do produto que deseja.
+> http://127.0.0.1:8000/api/produto/log/{id}
