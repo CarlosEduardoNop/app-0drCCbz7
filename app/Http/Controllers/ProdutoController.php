@@ -16,7 +16,7 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        return logProduto::all();
+        return Produtos::all();
     }
 
     public function getLog($id)
@@ -103,14 +103,11 @@ class ProdutoController extends Controller
                     if (is_numeric($request->quantidade)){
                         $newLog->quantidade = $request->quantidade;
                         $newLog->quantidade_anterior = $existingItem->quantidade;
-                        if($request->operacao == '+'){
-                            $existingItem->quantidade = $existingItem->quantidade + $request->quantidade;
+                        if($request->operacao == '+'){$existingItem->quantidade = $existingItem->quantidade + $request->quantidade;
                             $newLog->operacao = '+';
-                        }elseif($request->operacao == '-'){
-                            $existingItem->quantidade = $existingItem->quantidade - $request->quantidade;
+                        }elseif($request->operacao == '-'){$existingItem->quantidade = $existingItem->quantidade - $request->quantidade;
                             $newLog->operacao = '-';
-                        }else{
-                            $existingItem->quantidade = $request->quantidade;
+                        }else{$existingItem->quantidade = $request->quantidade;
                             $newLog->operacao = '+';
                         };
                         $newLog->quantidade_atual = $existingItem->quantidade;
