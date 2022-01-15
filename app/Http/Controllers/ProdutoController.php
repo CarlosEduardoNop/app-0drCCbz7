@@ -54,6 +54,7 @@ class ProdutoController extends Controller
         $newProduto->sku = $sku;
         $newProduto->quantidade = $request->quantidade;
         $newProduto->save();
+        return $newProduto;
     }
 
     /**
