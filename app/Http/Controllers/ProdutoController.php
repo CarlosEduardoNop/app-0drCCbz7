@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductControllerRequest;
-use App\Http\Requests\ProductControllerUpdateeRequest;
+use App\Http\Requests\ProductControllerUpdateRequest;
 use Illuminate\Http\Request;
 use App\Models\Produtos;
 use App\Models\logProduto;
@@ -26,7 +26,7 @@ class ProdutoController extends Controller
 
     public function getLog($id)
     {
-        return logProduto::where('produto_id', $id)->orderBy('created_at')->get();
+        return logProduto::where('produto_id', $id)->orderByDesc('created_at')->get();
     }
 
     /**
@@ -89,18 +89,12 @@ class ProdutoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request)
+    public function update(ProductControllerUpdateRequest $request)
     {
         try{
-            if(!$request->id || !$request->quantidade)
-                return response()->json([
-                    'error' => "Ocorreu algum erro"
-                ]);
-            if(Produtos::find($request->id)){
-                return app(updateProduct::class)->update(Produtos::find($request->id), $request);
-            }
+            app(updateProduct::class)->update(Produtos::findOrFail($request->id), $request);
             return response()->json([
-                'error' => "Nenhum produto encontrado"
+                'error' => "Produto alterado com sucesso"
             ]);
         }catch(\Exception $exception){
             Log::error("ProdutoController.update", [
@@ -118,28 +112,24 @@ class ProdutoController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        $existingItem = Produtos::find($id);
-
-        if($existingItem){
-            $existingItem->delete();
-            return 'Item deletado com sucesso';
-        };
-
-        return 'Informe um ID correto';
-    }
-
-    public function destroyLog($id){
-        $existingItem = logProduto::find($id);
-
-        if($existingItem){
-            $existingItem->delete();
-            return 'Log deletada com sucesso';
-        };
-
-        return 'Informe um ID correto';
+        try{
+            Produtos::findOrFail($id)->delete();
+            return response()->json([
+                'message' => "Sucesso ao destruir o produto"
+            ]);
+        }catch(\Exception $exception){
+            Log::error("ProdutoController.update", [
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'message' => $exception->getMessage()
+            ]);
+            return response()->json([
+                'error' => "Ocorreu algum erro"
+            ]);
+        }
     }
 }

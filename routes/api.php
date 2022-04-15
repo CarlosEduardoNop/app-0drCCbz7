@@ -23,8 +23,7 @@ Route::get('/produtos', [\App\Http\Controllers\ProdutoController::class, 'index'
 Route::prefix('/produto')->group( function () {
         Route::post('/', [ProdutoController::class, 'store']);
         Route::put('/', [ProdutoController::class, 'update']);
+        Route::delete('/{id}', [ProdutoController::class, 'destroy']);
         Route::get('/log/{id}', [ProdutoController::class, 'getLog']);
-        Route::delete('/{id}', [ProdutoController::class, 'destroyProduct']);
-        Route::delete('/log/{id}', [ProdutoController::class, 'destroyLog']);
     }
 );

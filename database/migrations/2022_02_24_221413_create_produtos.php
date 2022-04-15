@@ -18,6 +18,8 @@ class CreateProdutos extends Migration
             $table->string('nome', 100);
             $table->string('sku', 100);
             $table->integer('quantidade');
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }
