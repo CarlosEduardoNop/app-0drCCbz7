@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductControllerRequest;
+use App\Http\Requests\ProductControllerUpdateeRequest;
 use Illuminate\Http\Request;
 use App\Models\Produtos;
 use App\Models\logProduto;
+use App\Services\compareOperations;
+use App\Services\updateProduct;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class ProdutoController extends Controller
 {
@@ -31,30 +36,28 @@ class ProdutoController extends Controller
      */
     public function create()
     {
-        
+
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductControllerRequest $request)
     {
-        $newProduto = new Produtos();
-        if ($request->nome == null or ''){
-            return 'Nome inválido';
-        };
-        if ($request->quantidade <= 0 or null){
-            return 'Quantidade inválida';
-        };
-        $sku = bin2hex(random_bytes(12));
-        $newProduto->nome = $request->nome;
-        $newProduto->sku = $sku;
-        $newProduto->quantidade = $request->quantidade;
-        $newProduto->save();
-        return $newProduto;
+        try{
+            $sku = bin2hex(random_bytes(12));
+            return Produtos::create([
+                'nome' =>  $request->nome,
+                'sku' => $sku,
+                'quantidade' => $request->quantidade
+            ]);
+        }catch (ProductControllerRequest $e){
+            return response()->json([
+                'error' => $e
+            ]);
+        }
     }
 
     /**
@@ -84,44 +87,31 @@ class ProdutoController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        if ($id){
-            $existingItem = Produtos::find($id);
-            if($existingItem){
-                $newLog = new logProduto();
-                $newLog->sku = $existingItem->sku;
-                if($request->sku){
-                    if(is_bool($request->sku)){
-                        $newLog->novo_sku = $existingItem->sku;
-                        $existingItem->sku = bin2hex(random_bytes(12));
-                        $newLog->sku = $existingItem->sku;
-                    };
-                };
-                if($request->quantidade and $request->quantidade >= 1){
-                    if (is_numeric($request->quantidade)){
-                        $newLog->quantidade = $request->quantidade;
-                        $newLog->quantidade_anterior = $existingItem->quantidade;
-                        if($request->operacao == '+'){$existingItem->quantidade = $existingItem->quantidade + $request->quantidade;
-                            $newLog->operacao = '+';
-                        }elseif($request->operacao == '-'){$existingItem->quantidade = $existingItem->quantidade - $request->quantidade;
-                            $newLog->operacao = '-';
-                        }else{$existingItem->quantidade = $request->quantidade;
-                            $newLog->operacao = '+';
-                        };
-                        $newLog->quantidade_atual = $existingItem->quantidade;
-                    };
-                };
-                if($request->sku == false and is_numeric($request->quantidade) == false){return 'Houve algum erro ao tentar alterar o produto';};
-                $existingItem->save();
-                $newLog->produto_id = $id;
-                $newLog->save();
-                return $existingItem;
-            };
-            return 'Item não encontrado';
-        };
+        try{
+            if(!$request->id || !$request->quantidade)
+                return response()->json([
+                    'error' => "Ocorreu algum erro"
+                ]);
+            if(Produtos::find($request->id)){
+                return app(updateProduct::class)->update(Produtos::find($request->id), $request);
+            }
+            return response()->json([
+                'error' => "Nenhum produto encontrado"
+            ]);
+        }catch(\Exception $exception){
+            Log::error("ProdutoController.update", [
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'message' => $exception->getMessage()
+            ]);
+            return response()->json([
+                'error' => "Ocorreu algum erro"
+            ]);
+        }
     }
 
     /**

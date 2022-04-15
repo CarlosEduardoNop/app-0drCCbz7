@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLogProdutosTable extends Migration
+class CreateLogProdutos extends Migration
 {
     /**
      * Run the migrations.
@@ -17,13 +17,11 @@ class CreateLogProdutosTable extends Migration
             $table->id();
             $table->unsignedBigInteger('produto_id');
             $table->string('sku');
-            $table->string('novo_sku')->nullable();
-            $table->integer('quantidade')->nullable();
-            $table->integer('quantidade_atual')->nullable();
-            $table->integer('quantidade_anterior')->nullable();
-            $table->string('operacao')->nullable();
+            $table->integer('quantidade');
 
-            $table->foreign('produto_id')->references('id')->on('produtos');
+            $table->foreign('produto_id')
+                ->references('id')
+                ->on('produtos');
             $table->timestamps();
         });
     }
